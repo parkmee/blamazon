@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 
 connection.connect(err => {
     if (err) throw err;
-    console.log(`Connection ID: ${connection.threadId}`);
+    console.log(`Welcome, customer #${connection.threadId}!`);
     seeProducts();
 });
 
@@ -19,31 +19,50 @@ const seeProducts = () => {
     connection.query('SELECT * FROM products', (err, res) => {
         if (err) throw err;
         console.table(res);
-        getProducts(res);
+        buyProducts(res);
     });
-    connection.end();
 }
 
-const getProducts = (products) => {
+const buyProducts = (products) => {
     inquirer.prompt([
         {
             type: 'input',
-            message: 'What is the item_id of the product you would like to buy?',
+            message: 'What is the ID of the product you would like to buy?',
             name: 'itemId'
         },
         {
             type: 'input',
             message: 'How many units of the product would you like to buy?',
-            name: 'purchaseAmt'
+            name: 'buyAmt'
         }
     ]).then(ans => {
-        console.log(ans.itemId);
-        const index = products.map(function(x) {
-            return x.id;
-        }).indexOf(ans.itemId);
-        console.log(index);
-        console.log(products);
-        console.log(products[index]);
-        //console.log(res);
-    })
+        for (i in products) {
+            const p = products[i];
+            if (p.item_id == ans.itemId) {
+                if (p.stock_quantity >= ans.buyAmt) {
+                    const newQty = p.stock_quantity - ans.buyAmt;
+                    connection.query("UPDATE products SET ? WHERE ?",
+                        [
+                            {
+                                stock_quantity: newQty
+                            },
+                            {
+                                item_id: p.item_id
+                            }
+                        ],
+                        (err, res) => {
+                            if (err) throw err;
+                            const cost = parseFloat(ans.buyAmt * p.price);
+                            console.log(`\nYour purchase of ${ans.buyAmt} ${p.product_name} ($${p.price}/each) cost $${cost}`);
+                            connection.end();
+                        }
+                    );
+                } else {
+                    console.log(`\nInsufficient quantity of ${p.product_name} in stock. Please try again.\n`);
+                    seeProducts();
+                }
+            }
+        }
+        
+    });
 }
