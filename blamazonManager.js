@@ -44,7 +44,7 @@ const mgrMenu = () => {
                 break;
             case "Add to Inventory": 
                 console.log("Adding inventory...\n");
-                addInventory();
+                addInventory(res);
                 break;
             case "Add New Product": 
                 console.log("Adding new product...\n");
@@ -59,20 +59,65 @@ const mgrMenu = () => {
 
 const viewProducts = (products) => {
     console.table(products);
-    setTimeout(mgrMenu, 2000);
+    setTimeout(mgrMenu, 1000);
 }
 
 const lowInventory = (products) => {
-
-
+    const lowInventory = [];
+    for (i in products) {
+        if (products[i].stock_quantity < 5) {
+            lowInventory.push(products[i]);
+        }
+    }
+    console.table(lowInventory);
+    setTimeout(mgrMenu, 1000);
 }
 
-const addInventory = () => {
+const addInventory = (products) => {
+    console.table(products);
 
+    inquirer.prompt([
+        {
+            message: "Enter product id: ",
+            name: "itemId"
+        },
+        {
+            message: "Enter number of units to add: ",
+            name: "productQty"
+        }
+    ]).then(ans => {
+        let itemMatch = false;
+
+        for (i in products) {
+            const p = products[i];
+            if (p.item_id == ans.itemId) {
+                itemMatch = true;
+                const newQty = p.stock_quantity + parseInt(ans.productQty);
+                connection.query("UPDATE products SET ? WHERE ?",
+                    [
+                        {
+                            stock_quantity: newQty
+                        },
+                        {
+                            item_id: p.item_id
+                        }
+                    ], (err, res) => {
+                        if (err) throw err;
+                        console.log(`\nYou have ${newQty} units of ${p.product_name} in your inventory\n`);
+                        mgrMenu();    
+                    }
+                );
+            }
+        }
+        if (!itemMatch) {
+            console.log("Enter a valid item ID");
+            addInventory(products);
+        }
+    });
 }
 
 const addProduct = () => {
-    const dept = [];
+    let dept = [];
     connection.query("SELECT DISTINCT department_name FROM products", (err, res) => {
         if (err) throw err;
         for (i in res) {
@@ -100,7 +145,6 @@ const addProduct = () => {
             name: "productQty"
         }
     ]).then(ans => {
-        console.log(ans);
         connection.query("INSERT INTO products SET ?", 
             {
                 product_name: ans.productName,

@@ -80,8 +80,7 @@ const buyProducts = (products) => {
                             {
                                 item_id: p.item_id
                             }
-                        ],
-                        (err, res) => {
+                        ], (err, res) => {
                             if (err) throw err;
                             const cost = parseFloat(ans.buyAmt * p.price); // calculate cost
                             console.log(`\nYour purchase of ${ans.buyAmt} ${p.product_name} ($${p.price}/each) cost $${cost}\n`);
