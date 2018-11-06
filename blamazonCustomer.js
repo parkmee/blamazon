@@ -26,7 +26,7 @@ const menu = () => {
     inquirer.prompt([
         {
             type: "list",
-            message: "What woud you like to do?",
+            message: "What would you like to do?",
             choices: ["Buy", "Exit"],
             name: "menuChoice"
         }
