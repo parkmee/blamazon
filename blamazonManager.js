@@ -12,24 +12,24 @@ const connection = mysql.createConnection({
 });
 
 const spacer = "***************************************************";
-connection.connect(err=> {
+connection.connect(err=> { // connect to mysql server
     if (err) throw err;
     console.log(`
     ${spacer}
                     Blamazon - Manager View
     ${spacer}\n`);
-    mgrMenu();
+    mgrMenu(); // goto function to run menu
 });
 
-const mgrMenu = () => {
-    inquirer.prompt([
+const mgrMenu = () => { // show menu
+    inquirer.prompt([ // prompt user for menu selection
         {
             type: "list",
             message: "Pick an Option:",
             choices: ["View Products", "View Low Inventory", "Add to Inventory", "Add New Product", "Exit"],
             name: "mgrChoice"
         }
-    ]).then(ans => {
+    ]).then(ans => { // goto function based on user entry
         connection.query("SELECT * FROM products", (err, res) => {
             if (err) throw err;
 
@@ -57,26 +57,26 @@ const mgrMenu = () => {
     });
 }
 
-const viewProducts = (products) => {
+const viewProducts = (products) => { // show table of products
     console.table(products);
     setTimeout(mgrMenu, 1000);
 }
 
-const lowInventory = (products) => {
+const lowInventory = (products) => { // show table of products with inventory <5 units
     const lowInventory = [];
     for (i in products) {
         if (products[i].stock_quantity < 5) {
-            lowInventory.push(products[i]);
+            lowInventory.push(products[i]); // create array of products with <5 units
         }
     }
-    console.table(lowInventory);
-    setTimeout(mgrMenu, 1000);
+    console.table(lowInventory); // print table of low inventory products
+    setTimeout(mgrMenu, 1000); // revert to manager menu after 1 sec
 }
 
-const addInventory = (products) => {
-    console.table(products);
+const addInventory = (products) => { // add products to database
+    console.table(products); // show table of products
 
-    inquirer.prompt([
+    inquirer.prompt([ // prompt user to select product and quantity to add
         {
             message: "Enter product id: ",
             name: "itemId"
@@ -86,14 +86,14 @@ const addInventory = (products) => {
             name: "productQty"
         }
     ]).then(ans => {
-        let itemMatch = false;
+        let itemMatch = false; // indicator to check for valid product id
 
         for (i in products) {
             const p = products[i];
-            if (p.item_id == ans.itemId) {
-                itemMatch = true;
-                const newQty = p.stock_quantity + parseInt(ans.productQty);
-                connection.query("UPDATE products SET ? WHERE ?",
+            if (p.item_id == ans.itemId) { // checks if id user entered matched id in database
+                itemMatch = true; // set indicator to true if match
+                const newQty = p.stock_quantity + parseInt(ans.productQty); // calculate new qty of stock
+                connection.query("UPDATE products SET ? WHERE ?", // update table with new quantity where id matches
                     [
                         {
                             stock_quantity: newQty
@@ -109,23 +109,23 @@ const addInventory = (products) => {
                 );
             }
         }
-        if (!itemMatch) {
+        if (!itemMatch) { // if no id match is found, print error message and restart function
             console.log("Enter a valid item ID");
             addInventory(products);
         }
     });
 }
 
-const addProduct = () => {
+const addProduct = () => { // add new product to product table
     let dept = [];
     connection.query("SELECT DISTINCT department_name FROM products", (err, res) => {
         if (err) throw err;
         for (i in res) {
-            dept.push(res[i].department_name);
+            dept.push(res[i].department_name); // add unique department names to dept array
         }
     });
 
-    inquirer.prompt([
+    inquirer.prompt([ // prompt user for product name, department, price, and qty
         {
             message: "Enter product name: ",
             name: "productName"
@@ -145,7 +145,7 @@ const addProduct = () => {
             name: "productQty"
         }
     ]).then(ans => {
-        connection.query("INSERT INTO products SET ?", 
+        connection.query("INSERT INTO products SET ?", // add new record to products table based on user entries
             {
                 product_name: ans.productName,
                 department_name: ans.productDept,
@@ -155,7 +155,7 @@ const addProduct = () => {
             (err, res) => {
                 if (err) throw err;
                 console.log(`${ans.productName} added to the inventory`);
-                mgrMenu();
+                mgrMenu(); // revert to main manager menu
             }
         );
     });
