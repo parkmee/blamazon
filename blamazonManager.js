@@ -30,7 +30,7 @@ const mgrMenu = () => { // show menu
             name: "mgrChoice"
         }
     ]).then(ans => { // goto function based on user entry
-        connection.query("SELECT * FROM products", (err, res) => {
+        connection.query("SELECT item_id AS ID, product_name AS Product, department_name AS Department, price AS Price, stock_quantity AS Qty, product_sales AS Subtotal FROM products", (err, res) => {
             if (err) throw err;
 
             switch (ans.mgrChoice) {
@@ -65,7 +65,7 @@ const viewProducts = (products) => { // show table of products
 const lowInventory = (products) => { // show table of products with inventory <5 units
     const lowInventory = [];
     for (i in products) {
-        if (products[i].stock_quantity < 5) {
+        if (products[i].Qty < 5) {
             lowInventory.push(products[i]); // create array of products with <5 units
         }
     }
@@ -90,20 +90,20 @@ const addInventory = (products) => { // add products to database
 
         for (i in products) {
             const p = products[i];
-            if (p.item_id == ans.itemId) { // checks if id user entered matched id in database
+            if (p.ID == ans.itemId) { // checks if id user entered matched id in database
                 itemMatch = true; // set indicator to true if match
-                const newQty = p.stock_quantity + parseInt(ans.productQty); // calculate new qty of stock
+                const newQty = p.Qty + parseInt(ans.productQty); // calculate new qty of stock
                 connection.query("UPDATE products SET ? WHERE ?", // update table with new quantity where id matches
                     [
                         {
                             stock_quantity: newQty
                         },
                         {
-                            item_id: p.item_id
+                            item_id: p.ID
                         }
                     ], (err, res) => {
                         if (err) throw err;
-                        console.log(`\nYou have ${newQty} units of ${p.product_name} in your inventory\n`);
+                        console.log(`\nYou have ${newQty} units of ${p.Product} in your inventory\n`);
                         mgrMenu();    
                     }
                 );

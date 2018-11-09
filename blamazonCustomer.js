@@ -43,7 +43,7 @@ const menu = () => {
 const seeProducts = () => {
     // print product table
     connection.query(`
-    SELECT item_id, product_name, departments.department_name, price, stock_quantity FROM products 
+    SELECT item_id AS ID, product_name AS Product, departments.department_name AS Department, price AS Price, stock_quantity AS Qty FROM products 
     LEFT JOIN departments 
     ON products.department_id = departments.department_id`, 
     (err, res) => {
