@@ -1,4 +1,4 @@
-# BLAM!-AZON
+# BLAMAZON
 This application ....
 
 ## Getting Started
