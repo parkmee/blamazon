@@ -4,7 +4,9 @@ This application ....
 ## Getting Started
 
 ### Customer
-* Start the customer service app by entering [node blamazonCustomer.js] (/assets/images/customerStart.PNG) on the command line
+Start the customer service app by entering [node blamazonCustomer.js] (assets/images/customerStart.PNG) on the command 
+
+[invalid responses](assets/images/customerStart.PNG) 
 
 
 
