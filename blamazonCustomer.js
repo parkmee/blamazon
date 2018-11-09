@@ -72,7 +72,7 @@ const buyProducts = () => {
                 name: 'itemId',
                 validate: (value) => {
                     const pass = value.match(/[0-9]/g);
-                    if (pass) {
+                    if (pass && value > 0) {
                         return true;
                     } else {
                         console.log("\nPlease enter a number");
@@ -86,7 +86,7 @@ const buyProducts = () => {
                 name: 'buyAmt',
                 validate: (value) => {
                     const pass = value.match(/[0-9]+/g);
-                    if (pass) {
+                    if (pass && value > 0) {
                         return true;
                     } else {
                         console.log("\nPlease enter a number");
