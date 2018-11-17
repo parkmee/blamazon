@@ -27,7 +27,7 @@ Start the supervisor app by entering [node blamazonSupervisor.js](assets/imagess
 
 ## Links
 
-https://github.com/parkmee/blamazon
+[https://github.com/parkmee/blamazon](https://github.com/parkmee/blamazon)
 
 ## Authors
 
